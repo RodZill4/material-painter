@@ -16,15 +16,21 @@ _global_script_class_icons={
 [application]
 
 config/name="Material Painter"
+config/description="A Substance Painter alternative made in the Godot Engine"
 run/main_scene="res://main/main.tscn"
-config/icon="res://icon.png"
+run/low_processor_mode=true
+config/icon="res://icon.svg"
+config/load_assets=true
+config/load_assets.debug=true
+config/initialize_painter=true
+config/initialize_painter.debug=true
 
 [autoload]
 
-TextureManager="*res://autoloads/texture_manager.gd"
-Globals="*res://autoloads/globals.gd"
-LayerBlendViewportManager="*res://autoloads/layer_blend_viewport_manager.gd"
-NormalMapGenerationViewport="*res://render_viewports/normal_map_generation_viewport/normal_map_generation_viewport.gd"
+Globals="*res://main/globals.gd"
+LayerBlendViewportManager="*res://addons/layer_blending_viewport/layer_blend_viewport_manager.gd"
+NormalMapGenerationViewport="*res://3d_viewport/normal_map_generation_viewport/normal_map_generation_viewport.gd"
+PreviewRenderer="*res://preview_renderer/preview_renderer.tscn"
 
 [debug]
 

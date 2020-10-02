@@ -1,8 +1,12 @@
 extends "res://layers/texture_layer.gd"
 
+"""
+A texture layer that uses a color to generate the result
+"""
+
 export var color := Color.white
 
-func _init(_name := "Untitled Color Texture").("color"):
+func _init(_name := "Color").("color"):
 	name = _name
 
 

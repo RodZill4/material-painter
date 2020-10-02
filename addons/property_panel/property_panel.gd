@@ -1,20 +1,41 @@
 extends Panel
 
 """
-A inspector-like panel that builds a list of `PropertyContainers`s from its `properties`
+An inspector-like panel that builds a list of `PropertyContainer`s
 
-The resulting values can be retrieved using `get_property_value` and `get_property_values`.
-`get_property_values` returns a `Dictionary` with the property names as keys and the values as values.
-A `Dictionary` similar to the result of `get_property_values` can be fed to `load_values` to update the values of the `PropertyContainers`s.
+When the `properties` are set,
+a `PropertyContainer` is generated for each property.
+
+The resulting values can be retrieved using
+`get_property_value` and `get_property_values`.
+
+`get_property_values` returns a `Dictionary` with the
+property names as keys and the values as values.
+
+A `Dictionary` similar to the result of `get_property_values` can be fed
+to `load_values` to update the values of the `PropertyContainers`s.
 """
+
+enum Orientation {
+	VERTICAL,
+	HORIZONTAL,
+}
+
+export(Orientation) var orientation := Orientation.VERTICAL
 
 signal values_changed
 
 var properties := [] setget set_properties
 
-onready var properties_container : VBoxContainer = $Properties
+onready var properties_container : Container
+onready var scroll_container : ScrollContainer = $ScrollContainer
 
 func _ready():
+# warning-ignore:incompatible_ternary
+	properties_container = HBoxContainer.new() if orientation == Orientation.HORIZONTAL else VBoxContainer.new()
+	properties_container.size_flags_horizontal = SIZE_EXPAND_FILL
+	properties_container.size_flags_vertical = SIZE_EXPAND_FILL
+	scroll_container.add_child(properties_container)
 	setup_property_containers()
 
 
@@ -34,12 +55,17 @@ func setup_property_containers() -> void:
 		var property_container = load("res://addons/property_panel/property_container/property_container.tscn").instance()
 		property_container.name = property.name
 		property_container.connect("property_changed", self, "_on_Property_changed")
+
 		properties_container.add_child(property_container)
 		property_container.setup(property)
 
 
 func get_property_value(property_name : String):
 	return properties_container.get_node(property_name).get_value()
+
+
+func set_property_value(property_name : String, value):
+	return properties_container.get_node(property_name).set_value(value)
 
 
 func get_property_values() -> Dictionary:
@@ -51,7 +77,7 @@ func get_property_values() -> Dictionary:
 
 func store_values(instance : Object) -> void:
 	var property_values := get_property_values()
-	for value in property_values.keys():
+	for value in property_values:
 		instance.set(value, property_values[value])
 
 
@@ -60,6 +86,10 @@ func load_values(instance : Object) -> void:
 	for property_container in properties_container.get_children():
 		property_container.set_value(instance.get(property_container.property.name))
 	set_block_signals(false)
+
+
+func clear() -> void:
+	set_properties([])
 
 
 func _on_Property_changed():
